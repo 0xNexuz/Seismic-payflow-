@@ -1,0 +1,5 @@
+{
+  "name": "Seismic PayFlow",
+  "description": "A privacy-first, deterministic fintech payment demo showcasing SeismicSys execution layers, private balances, and network-grade reliability.",
+  "requestFramePermissions": []
+}
