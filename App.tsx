@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import { WalletState, Transaction, TransactionStatus } from './types';
 import { SeismicEngine } from './lib/seismic-engine';
 import WaveBackground from './components/WaveBackground';
@@ -9,14 +9,19 @@ import ExecutionTimeline from './components/ExecutionTimeline';
 import { ShieldCheck, Zap, Activity, Info, Code } from 'lucide-react';
 
 const SeismicLogo = () => (
-  <svg viewBox="0 0 100 100" className="w-full h-full drop-shadow-lg" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M48 2L85 18L95 65L42 98L8 65L25 22L48 2Z" fill="#b3889b" />
-    <path d="M48 2L42 28L25 22L48 2Z" fill="#c499ab" />
-    <path d="M48 2L85 18L65 52L42 28L48 2Z" fill="#a3788b" />
-    <path d="M42 28L65 52L42 98L15 55L42 28Z" fill="#8b6d7a" />
-    <path d="M65 52L95 65L42 98L65 52Z" fill="#7a5c69" />
-    <path d="M25 22L42 28L15 55L8 65L25 22Z" fill="#997a8a" />
-    <path d="M15 55L42 98L8 65L15 55Z" fill="#6d5460" />
+  <svg viewBox="0 0 100 120" className="w-full h-full drop-shadow-xl" fill="none" xmlns="http://www.w3.org/2000/svg">
+    {/* The main faceted rock shape mimicking the provided image */}
+    <path d="M48 5L75 25L88 85L52 115L15 90L10 60L48 5Z" fill="#b3889b" />
+    {/* Top Right Facet (Lighter) */}
+    <path d="M48 5L75 25L55 45L48 5Z" fill="#c9a7b8" />
+    {/* Main Front Facet (Base Mauve) */}
+    <path d="M48 5L55 45L42 90L15 90L10 60L48 5Z" fill="#b3889b" />
+    {/* Right Edge Facet (Shadow) */}
+    <path d="M75 25L88 85L52 115L42 90L55 45L75 25Z" fill="#8b6d7a" />
+    {/* Bottom Facet (Darkest) */}
+    <path d="M15 90L42 90L52 115L15 90Z" fill="#6d5460" />
+    {/* Highlight Detail */}
+    <path d="M48 5L55 45L42 90L48 5Z" fill="#be99ab" opacity="0.6" />
   </svg>
 );
 
@@ -32,7 +37,6 @@ const App: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   
   const engine = SeismicEngine.getInstance();
-  const txIdCounter = useRef(0);
 
   const connectWallet = () => setWallet(prev => ({ ...prev, isConnected: true }));
 
@@ -41,7 +45,6 @@ const App: React.FC = () => {
     
     setTransactions(prev => [newTx, ...prev]);
 
-    // Simulate lifecycle
     setTimeout(() => {
       setTransactions(prev => prev.map(t => t.id === newTx.id ? { ...t, status: TransactionStatus.SEQUENCED } : t));
     }, 800);
@@ -62,7 +65,6 @@ const App: React.FC = () => {
     setIsHighLoad(true);
     const mockRecipients = ['0x882...11B', '0x992...22C', '0xAA1...33D'];
     
-    // Fire 10 concurrent transactions
     for (let i = 0; i < 10; i++) {
       setTimeout(() => {
         executePayment(
@@ -70,7 +72,7 @@ const App: React.FC = () => {
           (Math.random() * 100).toFixed(2), 
           true
         );
-      }, i * 50); // Minimal delay to simulate high-frequency burst
+      }, i * 50);
     }
 
     setTimeout(() => setIsHighLoad(false), 2000);
@@ -80,10 +82,9 @@ const App: React.FC = () => {
     <div className="min-h-screen relative overflow-hidden flex flex-col bg-[#140f11]">
       <WaveBackground />
       
-      {/* Header */}
       <nav className="relative z-10 px-8 py-6 flex justify-between items-center border-b border-white/5 backdrop-blur-md">
         <div className="flex items-center gap-4">
-          <div className="w-12 h-12 flex items-center justify-center p-1">
+          <div className="w-10 h-12 flex items-center justify-center">
             <SeismicLogo />
           </div>
           <span className="text-xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white to-[#b3889b]">
@@ -115,18 +116,13 @@ const App: React.FC = () => {
         </div>
       </nav>
 
-      {/* Main Content */}
       <main className="relative z-10 flex-1 grid grid-cols-1 lg:grid-cols-12 gap-8 px-8 py-10 max-w-7xl mx-auto w-full">
-        
-        {/* Left Column: UI Controls */}
         <div className="lg:col-span-5 space-y-6">
           <BalanceCard wallet={wallet} />
-          
           <PaymentForm 
             isConnected={wallet.isConnected} 
             onSend={(to, amount) => executePayment(to, amount)} 
           />
-
           <div className="p-6 rounded-2xl bg-slate-900/30 border border-white/5 backdrop-blur-sm space-y-4">
             <div className="flex justify-between items-center">
               <div className="flex items-center gap-2 text-slate-400 font-medium">
@@ -150,13 +146,11 @@ const App: React.FC = () => {
           </div>
         </div>
 
-        {/* Right Column: Execution Log */}
         <div className="lg:col-span-7 flex flex-col h-full min-h-[500px]">
           <ExecutionTimeline transactions={transactions} />
         </div>
       </main>
 
-      {/* Footer Info */}
       <div className="relative z-10 px-8 py-6 flex flex-wrap gap-6 items-center border-t border-white/5 bg-slate-950/50 backdrop-blur-md">
         <div className="flex items-center gap-2 text-xs text-slate-500">
           <ShieldCheck size={14} className="text-[#b3889b]" />
@@ -172,7 +166,6 @@ const App: React.FC = () => {
         </div>
       </div>
 
-      {/* Contract Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-black/80 backdrop-blur-sm">
           <div className="bg-slate-900 border border-white/10 rounded-3xl w-full max-w-4xl max-h-[80vh] overflow-hidden flex flex-col shadow-2xl">
@@ -183,52 +176,26 @@ const App: React.FC = () => {
               <button onClick={() => setIsModalOpen(false)} className="text-slate-400 hover:text-white">Close</button>
             </div>
             <div className="p-6 overflow-y-auto bg-black/40 mono text-sm text-[#e0d4d9]/80 leading-relaxed whitespace-pre">
-{`// SEISMIC SMART CONTRACT: PRIVACY-FIRST PAYMENTS
-// Seismic uses a deterministic execution layer with private state.
-
-#[seismic_contract]
+{`#[seismic_contract]
 pub struct SeismicPay {
-    // Balances are stored in a private state tree.
-    // They are only readable by the owner or authorized zero-knowledge circuits.
     #[private_state]
     balances: Mapping<Address, u64>,
 }
 
 impl SeismicPay {
-    /// Initialize a private balance. 
-    /// In production, this would be an atomic bridge event.
-    pub fn initialize_balance(&mut self, amount: u64) {
-        let sender = context::sender();
-        self.balances.insert(sender, amount);
-        
-        // Emits a public event, but the 'amount' and 'user' can be masked if needed.
-        event::emit("BalanceInitialized", { user: sender });
-    }
-
-    /// Execute a private payment.
-    /// Execution order is deterministic based on the sequencer slot.
     pub fn send_payment(&mut self, to: Address, amount: u64) {
         let sender = context::sender();
         let current_bal = self.balances.get(sender).expect("Insufficient funds");
-        
         assert!(current_bal >= amount, "Error: Overdraft prevented");
 
-        // State updates are committed atomically.
         self.balances.insert(sender, current_bal - amount);
         let recipient_bal = self.balances.get(to).unwrap_or(0);
         self.balances.insert(to, recipient_bal + amount);
 
-        // Public metadata emitted for auditing without revealing amounts.
         event::emit("PaymentExecuted", { 
             tx_id: context::tx_hash(),
             slot: context::current_slot()
         });
-    }
-
-    /// Retrieve the caller's private balance.
-    /// Only returns data if the caller proves identity (ZK or Signed Query).
-    pub fn get_my_balance(&self) -> u64 {
-        self.balances.get(context::sender()).unwrap_or(0)
     }
 }`}
             </div>
